@@ -25,15 +25,15 @@ const getUserId = () => {
 const userId = getUserId();
 
 // 🔹 Step 1: Initialize Amplitude
-init("4a71948dd893820193950f208b58ab8d");
-setUserId(userId);
+//init("4a71948dd893820193950f208b58ab8d");
+//setUserId(userId);
 
-const identity = new Identify();
-identity.set("variation", "send");
-identify(identity);
+//const identity = new Identify();
+//identity.set("variation", "send");
+//identify(identity);
 
 // 🔁 Push an event to flush the user property to Amplitude
-track("variation_set", { variation: "send" });
+//track("variation_set", { variation: "send" });
 
 // 🔹 Step 2: Set up GrowthBook
 const gb = new GrowthBook({
@@ -47,6 +47,17 @@ const gb = new GrowthBook({
 
 // Load features from GrowthBook first
 gb.loadFeatures().then(() => {
+  // Get the actual assigned variation from GrowthBook
+  const variation = gb.getFeatureValue("button-text", "submit"); // "submit" is the control/default
+
+  // Track it in Amplitude
+  const identity = new Identify();
+  identity.set("variation", variation);
+  identify(identity);
+
+  track("variation_set", { variation });
+
+  // Render the app
   const root = ReactDOM.createRoot(document.getElementById("root")!);
   root.render(
     <React.StrictMode>
@@ -56,3 +67,5 @@ gb.loadFeatures().then(() => {
     </React.StrictMode>
   );
 });
+
+
