@@ -8,6 +8,7 @@ import {
   identify,
   setUserId,
   Identify,
+  track,
 } from "@amplitude/analytics-browser";
 import { v4 as uuidv4 } from "uuid";
 
@@ -24,11 +25,15 @@ const getUserId = () => {
 const userId = getUserId();
 
 // 🔹 Step 1: Initialize Amplitude
-init("4a71948dd893820193950f208b58ab8d"); // Replace with your actual API key
-setUserId(userId); // Optional: use the same user ID you're testing in GrowthBook
+init("4a71948dd893820193950f208b58ab8d");
+setUserId(userId);
+
 const identity = new Identify();
-identity.set("variation", "send"); // or whatever value from GrowthBook
+identity.set("variation", "send");
 identify(identity);
+
+// 🔁 Push an event to flush the user property to Amplitude
+track("variation_set", { variation: "send" });
 
 // 🔹 Step 2: Set up GrowthBook
 const gb = new GrowthBook({
