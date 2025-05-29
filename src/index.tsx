@@ -3,13 +3,14 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { GrowthBook, GrowthBookProvider } from "@growthbook/growthbook-react";
 import * as amplitude from "@amplitude/analytics-browser";
+import { v4 as uuidv4 } from 'uuid';
 
 // 🔁 Generate or reuse a user ID
 const getUserId = () => {
   let uid = localStorage.getItem("user_id");
   if (!uid) {
-    uid = crypto.randomUUID(); // or use your own generator
-    localStorage.setItem("user_id", uid);
+  uid = uuidv4();
+  localStorage.setItem("user_id", uid);
   }
   return uid;
 };

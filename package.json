@@ -9,12 +9,13 @@
   ],
   "main": "src/index.tsx",
   "dependencies": {
+    "@amplitude/analytics-browser": "2.17.6",
+    "@growthbook/growthbook-react": "^1.0.0",
     "loader-utils": "3.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-scripts": "5.0.1",
-    "@growthbook/growthbook-react": "^1.0.0",
-    "@amplitude/analytics-browser": "2.17.6"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/react": "18.2.38",
