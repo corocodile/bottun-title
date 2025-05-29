@@ -4,9 +4,21 @@ import App from "./App";
 import { GrowthBook, GrowthBookProvider } from "@growthbook/growthbook-react";
 import * as amplitude from "@amplitude/analytics-browser";
 
+// 🔁 Generate or reuse a user ID
+const getUserId = () => {
+  let uid = localStorage.getItem("user_id");
+  if (!uid) {
+    uid = crypto.randomUUID(); // or use your own generator
+    localStorage.setItem("user_id", uid);
+  }
+  return uid;
+};
+
+const userId = getUserId();
+
 // 🔹 Step 1: Initialize Amplitude
 amplitude.init("4a71948dd893820193950f208b58ab8d"); // Replace with your actual API key
-amplitude.setUserId("user123"); // Optional: use the same user ID you're testing in GrowthBook
+amplitude.setUserId(userId); // Optional: use the same user ID you're testing in GrowthBook
 
 // 🔹 Step 2: Set up GrowthBook
 const gb = new GrowthBook({
@@ -14,7 +26,7 @@ const gb = new GrowthBook({
   clientKey: "sdk-UDnDy1ItoOS60e", // replace with actual client key
   enableDevMode: true,
   attributes: {
-    id: "user456", // test with other IDs if needed
+    id: userId, // test with other IDs if needed
   },
 });
 
