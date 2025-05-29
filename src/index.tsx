@@ -2,15 +2,21 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { GrowthBook, GrowthBookProvider } from "@growthbook/growthbook-react";
-import * as amplitude from "@amplitude/analytics-browser";
-import { v4 as uuidv4 } from 'uuid';
+//import * as amplitude from "@amplitude/analytics-browser";
+import {
+  init,
+  identify,
+  setUserId,
+  Identify,
+} from "@amplitude/analytics-browser";
+import { v4 as uuidv4 } from "uuid";
 
 // 🔁 Generate or reuse a user ID
 const getUserId = () => {
   let uid = localStorage.getItem("user_id");
   if (!uid) {
-  uid = uuidv4();
-  localStorage.setItem("user_id", uid);
+    uid = uuidv4();
+    localStorage.setItem("user_id", uid);
   }
   return uid;
 };
@@ -18,8 +24,11 @@ const getUserId = () => {
 const userId = getUserId();
 
 // 🔹 Step 1: Initialize Amplitude
-amplitude.init("4a71948dd893820193950f208b58ab8d"); // Replace with your actual API key
-amplitude.setUserId(userId); // Optional: use the same user ID you're testing in GrowthBook
+init("4a71948dd893820193950f208b58ab8d"); // Replace with your actual API key
+setUserId(userId); // Optional: use the same user ID you're testing in GrowthBook
+const identity = new Identify();
+identity.set("variation", "send"); // or whatever value from GrowthBook
+identify(identity);
 
 // 🔹 Step 2: Set up GrowthBook
 const gb = new GrowthBook({
