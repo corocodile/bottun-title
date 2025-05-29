@@ -25,8 +25,8 @@ const getUserId = () => {
 const userId = getUserId();
 
 // 🔹 Step 1: Initialize Amplitude
-//init("4a71948dd893820193950f208b58ab8d");
-//setUserId(userId);
+init("4a71948dd893820193950f208b58ab8d");
+setUserId(userId);
 
 //const identity = new Identify();
 //identity.set("variation", "send");
