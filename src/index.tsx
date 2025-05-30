@@ -44,17 +44,6 @@ const gb = new GrowthBook({
 
 // Load features from GrowthBook first
 gb.loadFeatures().then(() => {
-  // Get the actual assigned variation from GrowthBook
-  const variation = gb.getFeatureValue("button-text", "submit"); // "submit" is the control/default
-
-  // Track it in Amplitude
-  const identity = new Identify();
-  identity.set("variation", variation);
-  identify(identity);
-
-  track("variation_set", { variation });
-
-  // Render the app
   const root = ReactDOM.createRoot(document.getElementById("root")!);
   root.render(
     <React.StrictMode>
@@ -63,6 +52,13 @@ gb.loadFeatures().then(() => {
       </GrowthBookProvider>
     </React.StrictMode>
   );
+
+  // ✅ Track variation after GrowthBook has fully evaluated it
+  const variation = gb.getFeatureValue("button-text", "submit");
+  const identity = new Identify();
+  identity.set("variation", variation);
+  identify(identity);
+  track("variation_set", { variation });
 });
 
 
