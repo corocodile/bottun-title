@@ -14,12 +14,9 @@ import { v4 as uuidv4 } from "uuid";
 
 // 🔁 Generate or reuse a user ID
 const getUserId = () => {
-  let uid = localStorage.getItem("user_id");
-  if (!uid) {
-    uid = uuidv4();
-    localStorage.setItem("user_id", uid);
-  }
-  return uid;
+  const newId = uuidv4();
+  localStorage.setItem("user_id", newId); // optional: for visibility/debugging
+  return newId;
 };
 
 const userId = getUserId();
