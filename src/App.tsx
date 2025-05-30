@@ -1,12 +1,13 @@
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { track } from "@amplitude/analytics-browser";
 
-function App({ userId, variation }: { userId: string; variation: string }) {
+function App() {
+  // ✅ Get the variation from GrowthBook
   const buttonText = useFeatureValue("cta-text", "submit");
 
+  // ✅ Track click event in Amplitude with variation
   const handleClick = () => {
-    track("Task Button Clicked", {
-      user_id: userId,
+    track("task button clicked", {
       variation: buttonText,
     });
   };
