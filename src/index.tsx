@@ -7,55 +7,72 @@ import {
   identify,
   setUserId,
   Identify,
-  track,
 } from "@amplitude/analytics-browser";
 import { v4 as uuidv4 } from "uuid";
 
-// ✅ Generate a fresh user ID every time (for testing)
+// 🔁 Generate a new user ID each time (for testing distribution)
 const userId = uuidv4();
 
-// ✅ Optional: store it for debugging in localStorage (not reused)
-localStorage.setItem("user_id", userId);
+// 🟦 Detect user OS and browser (optional but helpful)
+const getUserContext = () => {
+  const userAgent = navigator.userAgent;
+  let os = "Unknown";
+  let browser = "Unknown";
 
-// ✅ Init Amplitude
-init("4a71948dd893820193950f208b58ab8d");
+  if (userAgent.includes("Win")) os = "Windows";
+  else if (userAgent.includes("Mac")) os = "MacOS";
+  else if (userAgent.includes("Linux")) os = "Linux";
+  else if (/Android/.test(userAgent)) os = "Android";
+  else if (/iPhone|iPad|iPod/.test(userAgent)) os = "iOS";
+
+  if (/Chrome/.test(userAgent)) browser = "Chrome";
+  else if (/Firefox/.test(userAgent)) browser = "Firefox";
+  else if (/Safari/.test(userAgent) && !/Chrome/.test(userAgent))
+    browser = "Safari";
+  else if (/Edg/.test(userAgent)) browser = "Edge";
+
+  return { os, browser };
+};
+
+const { os, browser } = getUserContext();
+
+// 🟦 Initialize Amplitude
+init("4a71948dd893820193950f208b58ab8d"); // Replace with real key
 setUserId(userId);
 
-// ✅ Create GrowthBook instance
+// ⬇️ Set user properties in Amplitude
+const identity = new Identify();
+identity.set("os", os);
+identity.set("browser", browser);
+identify(identity);
+
+// 🟩 Set up GrowthBook
 const gb = new GrowthBook({
   apiHost: "https://cdn.growthbook.io",
-  clientKey: "sdk-UDnDy1ItoOS60e",
+  clientKey: "sdk-UDnDy1ItoOS60e", // Replace with real key
   enableDevMode: true,
   attributes: {
-    id: userId, // this should match the "id" targeting rule in GrowthBook
+    id: userId,
+    os,
+    browser,
   },
 });
 
-// ✅ Load GrowthBook features first
+// ⬇️ Load feature flags before rendering
 gb.loadFeatures().then(() => {
-  // ✅ Mount the React app
+  // Track assigned variation as user property in Amplitude (optional)
+  const variation = gb.getFeatureValue("cta-text", "submit");
+  const identityWithVariation = new Identify();
+  identityWithVariation.set("variation", variation);
+  identify(identityWithVariation);
+
+  // Render the app
   const root = ReactDOM.createRoot(document.getElementById("root")!);
   root.render(
     <React.StrictMode>
       <GrowthBookProvider growthbook={gb}>
-        <App />
+        <App userId={userId} variation={variation} />
       </GrowthBookProvider>
     </React.StrictMode>
   );
-
-  // ✅ Wait a short moment to ensure GrowthBook has evaluated everything
-  setTimeout(() => {
-    const variation = gb.getFeatureValue("cta-text", "submit");
-
-    // ✅ DEBUG: Show variation in browser tab title
-    document.title = `Variation: ${variation}`;
-
-    // ✅ Send user properties to Amplitude
-    const identity = new Identify();
-    identity.set("variation", variation);
-    identify(identity);
-
-    // ✅ Track the variation assignment in Amplitude
-    track("variation_set", { variation });
-  }, 100); // You can increase to 200ms if needed
 });
