@@ -2,7 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { GrowthBook, GrowthBookProvider } from "@growthbook/growthbook-react";
-//import * as amplitude from "@amplitude/analytics-browser";
 import {
   init,
   identify,
@@ -12,38 +11,29 @@ import {
 } from "@amplitude/analytics-browser";
 import { v4 as uuidv4 } from "uuid";
 
-// 🔁 Generate or reuse a user ID
-const getUserId = () => {
-  const newId = uuidv4();
-  localStorage.setItem("user_id", newId); // optional: for visibility/debugging
-  return newId;
-};
+// ✅ Generate a fresh user ID every time (for testing)
+const userId = uuidv4();
 
-const userId = getUserId();
+// ✅ Optional: store it for debugging in localStorage (not reused)
+localStorage.setItem("user_id", userId);
 
-// 🔹 Step 1: Initialize Amplitude
+// ✅ Init Amplitude
 init("4a71948dd893820193950f208b58ab8d");
 setUserId(userId);
 
-//const identity = new Identify();
-//identity.set("variation", "send");
-//identify(identity);
-
-// 🔁 Push an event to flush the user property to Amplitude
-//track("variation_set", { variation: "send" });
-
-// 🔹 Step 2: Set up GrowthBook
+// ✅ Create GrowthBook instance
 const gb = new GrowthBook({
   apiHost: "https://cdn.growthbook.io",
-  clientKey: "sdk-UDnDy1ItoOS60e", // replace with actual client key
+  clientKey: "sdk-UDnDy1ItoOS60e",
   enableDevMode: true,
   attributes: {
-    id: userId, // test with other IDs if needed
+    id: userId, // this should match the "id" targeting rule in GrowthBook
   },
 });
 
-// Load features from GrowthBook first
+// ✅ Load GrowthBook features first
 gb.loadFeatures().then(() => {
+  // ✅ Mount the React app
   const root = ReactDOM.createRoot(document.getElementById("root")!);
   root.render(
     <React.StrictMode>
@@ -53,12 +43,19 @@ gb.loadFeatures().then(() => {
     </React.StrictMode>
   );
 
-  // ✅ Track variation after GrowthBook has fully evaluated it
-  const variation = gb.getFeatureValue("button-text", "submit");
-  const identity = new Identify();
-  identity.set("variation", variation);
-  identify(identity);
-  track("variation_set", { variation });
+  // ✅ Wait a short moment to ensure GrowthBook has evaluated everything
+  setTimeout(() => {
+    const variation = gb.getFeatureValue("button-text", "submit");
+
+    // ✅ DEBUG: Show variation in browser tab title
+    document.title = `Variation: ${variation}`;
+
+    // ✅ Send user properties to Amplitude
+    const identity = new Identify();
+    identity.set("variation", variation);
+    identify(identity);
+
+    // ✅ Track the variation assignment in Amplitude
+    track("variation_set", { variation });
+  }, 100); // You can increase to 200ms if needed
 });
-
-
