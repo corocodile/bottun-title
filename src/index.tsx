@@ -45,7 +45,7 @@ gb.loadFeatures().then(() => {
 
   // ✅ Wait a short moment to ensure GrowthBook has evaluated everything
   setTimeout(() => {
-    const variation = gb.getFeatureValue("button-text", "submit");
+    const variation = gb.getFeatureValue("cta-text", "submit");
 
     // ✅ DEBUG: Show variation in browser tab title
     document.title = `Variation: ${variation}`;
